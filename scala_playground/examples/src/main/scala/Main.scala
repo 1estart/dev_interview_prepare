@@ -31,3 +31,8 @@
   import sttp.client4.quick.*
 
   println(quickRequest.get(uri"http://httpbin.org/ip").send())
+
+
+  val env = Map("population" -> 1000000.0)
+  val expr = Div(Mul(Add(Num(1), Num(2)), Add(Num(3), Num(4))), Var("population"));
+  println(Expr.eval(expr, env))
