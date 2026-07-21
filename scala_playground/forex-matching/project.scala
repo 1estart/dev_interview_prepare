@@ -1,0 +1,7 @@
+//> using scala "3.6.2"
+//> using dep "org.typelevel::cats-effect:3.5.4"
+//> using dep "com.github.fd4s::fs2-kafka:3.6.0"
+//> using test.dep "org.scalameta::munit:1.0.0"
+//> using test.dep "org.typelevel::munit-cats-effect:2.0.0"
+//> using test.dep "com.dimafeng::testcontainers-scala-kafka:0.44.1"
+//> using test.dep "com.dimafeng::testcontainers-scala-munit:0.44.1"
