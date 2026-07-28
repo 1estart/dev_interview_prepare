@@ -9,7 +9,7 @@
 
   //  Printable
   42.print
-  "Uraboras".print
+  "Uraborasu".print
 
   Cat("Garfield", 5, "Orange").print
 
