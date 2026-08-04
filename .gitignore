@@ -9,3 +9,39 @@ project/target/
 .metals/
 .scala-build/
 .vscode/
+
+
+# --- Gradle ---
+.gradle/
+build/
+gradle-app.setting
+.gradletasknamecache
+
+# wrapper оставляем в репозитории
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# --- Скомпилированное ---
+*.class
+out/
+bin/
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# --- VS Code / Eclipse ---
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+
+# --- Kotlin ---
+*.kotlin_module
+
+# --- ОС ---
+.DS_Store
+Thumbs.db
