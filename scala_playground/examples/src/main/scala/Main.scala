@@ -5,8 +5,13 @@ import scala.util.Failure
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import cats.effect.kernel.Par
+import munit.Assertions.assertEquals
+import scala.annotation.tailrec
+import cats.effect.IOApp
+import cats.effect.IO
+import cats.implicits._
 
-@main def run(): Any =
+object IOExample extends IOApp.Simple {
   /*
   println("Hello, scala 3 with cats!!!".toUpperCase)
 
@@ -56,7 +61,7 @@ import cats.effect.kernel.Par
 
   println("Future")
 
-  val f = Future { 2 } 
+  val f = Future { 2 }
 
    f.transform {
     case Success(value) => Success(2)
@@ -71,9 +76,9 @@ import cats.effect.kernel.Par
   println("Hi")
   println(if true then "true" else "false")
 
-  */
+   */
 
-/*
+  /*
       Распарсить строки в структуру Transaction(userId: String, amount: Double, currency: String, timestamp: String)
     Отфильтровать транзакции с отрицательной или нулевой суммой
     Сгруппировать валидные транзакции по валюте
@@ -95,7 +100,6 @@ import cats.effect.kernel.Par
     Какие edge cases ты учел/не учел
     Теорию вокруг использованных конструкций
 
-*/
 
 
   val rawData: List[String] = List(
@@ -116,8 +120,8 @@ import cats.effect.kernel.Par
   object Transaction {
     def fromString(s: String): Either[ParseError, Transaction] = {
       s.split(';') match
-        case Array(userId, amount, currency, timestamp) => 
-          validateAmount(amount).flatMap( validatedAmount => 
+        case Array(userId, amount, currency, timestamp) =>
+          validateAmount(amount).flatMap( validatedAmount =>
             Right(Transaction(userId, validatedAmount, currency, timestamp))
           )
 
@@ -141,4 +145,142 @@ import cats.effect.kernel.Par
   assert(totalAmountInTxByCurrency(List("malformed_string")) == Map.empty)
   // assert(totalAmountInTxByCurrency(List("user2;invalid;EUR;2024-01-02")) == Map("EUR" -> Left("error_parsing")))
 
+   */
 
+  // val a = List(Some(2)).flatten
+
+  // val futures = List(
+  //   Future { 2 },
+  //   Future { 3 }
+  //   // Future { throw new RuntimeException }
+  // )
+
+  // val resFuture = Future.sequence(futures)
+  // val result = Await.result(resFuture, 2.seconds)
+
+  // @tailrec
+  // def rec(i: Int): Int = {
+  //   if i == 1 then 2 else rec(i - 1)
+  // }
+
+  // assertEquals(
+  //   rec(2),
+  //   2
+  // )
+
+  // trait A { def foo = "A" }
+  // trait B extends A { override def foo = "B" + super.foo }
+  // class C extends B with A // порядок важен
+
+  // assertEquals(
+  //   (new C).foo,
+  //   "BA"
+  // )
+
+  // /** 1) Cжать последовательность интов Seq(1, 2, 2, 3, 4, 3, 3, 3) => Seq((1,
+  //   * 1), (2, 2), (3, 1), (4, 1), (3, 3)) Ответ выдать в виде Seq[(Int, Int)]
+  //   * (число из последовательности и число последовательных повторений) 2)
+  //   * восстановаить исходную последовательность из сжатой
+  //   */
+
+  // val in = Seq(1, 2, 2, 3, 4, 3, 3, 3)
+
+  // @tailrec
+  // def compress(
+  //     acc: Seq[(Int, Int)] = Seq.empty,
+  //     seq: Seq[Int]
+  // ): Seq[(Int, Int)] = {
+  //   seq match
+  //     case a :: tail => {
+  //       acc match {
+  //         case head :: tailAcc if a == head._1 =>
+  //           compress((a, 1 + head._2) +: tailAcc, tail)
+  //         case _ =>
+  //           compress((a, 1) +: acc, tail)
+  //       }
+  //     }
+  //     case Nil => acc.reverse
+  // }
+
+  // def compress_1(seq: Seq[Int]): Seq[(Int, Int)] = compress(seq = seq)
+
+  // def uncompress(compressed: Seq[(Int, Int)]): Seq[Int] = {
+  //   compressed.flatMap { (element, count) =>
+  //     Seq.fill(count)(element)
+  //   }
+  // }
+
+  // assertEquals(
+  //   Seq((1, 1), (2, 2), (3, 1), (4, 1), (3, 3)),
+  //   compress_1(in)
+  // )
+  // assertEquals(
+  //   in,
+  //   uncompress(compress_1(in))
+  // )
+
+  /** На вход List[IO[String]] Получить IO[(List[String], List[Throwable]) -
+    * результат агрегации выполненых IO и исключений
+    */
+
+  val run = {
+
+    //   val talk = List(
+    //     IO.sleep(1.second).as("red"),
+    //     IO.raiseError(new RuntimeException("exception1")),
+    //     IO.pure("blue"),
+    //     IO.raiseError(new RuntimeException("exception2")),
+    //     IO.pure("green"),
+    //     IO.raiseError(new RuntimeException("exception3"))
+    //   )
+
+    //   talk
+    //     .traverse { io =>
+    //       io.map(Right[Throwable, String](_))
+    //         .recover { case throwable =>
+    //           Left(throwable)
+    //         }
+    //     }
+    //     .map(_.partitionMap {
+    //       identity
+    //     })
+    //     .flatTap {
+    //       IO.println(_)
+    //     }
+    //     .as(())
+
+    // }
+
+//   Написать реализацию Middleware, которая не позволяет
+// обрабатывать больше N одновременных вызовов apply.
+
+// Если лимит не достигнут, должен исполняться handler
+// Если достигнут, вызов должен падать с какой-нибудь ошибкой
+// */
+
+    type Req = Unit
+    type Resp = Unit
+
+    trait Middleware {
+      def apply(req: Req, handler: Req => IO[Resp]): IO[Resp]
+    }
+
+    trait Service extends Middleware {
+      private var limit = 4
+
+      def apply(req: Req, handler: Req => IO[Resp]): IO[Resp] = {
+
+        handler(req)
+      }
+    }
+
+    IO.unit
+  }
+
+// получить IO[(List[Throwable], List[String])
+
+  // println("*********************************************************")
+  // println("All assertions passed")
+  // println("***********************************************************")
+
+}
