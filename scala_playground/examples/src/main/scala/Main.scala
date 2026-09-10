@@ -5,6 +5,7 @@ import scala.util.Failure
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import cats.effect.kernel.Par
+import scala.util.Try
 
 @main def run(): Any =
   /*
@@ -56,7 +57,7 @@ import cats.effect.kernel.Par
 
   println("Future")
 
-  val f = Future { 2 } 
+  val f = Future { 2 }
 
    f.transform {
     case Success(value) => Success(2)
@@ -71,9 +72,9 @@ import cats.effect.kernel.Par
   println("Hi")
   println(if true then "true" else "false")
 
-  */
+   */
 
-/*
+  /*
       Распарсить строки в структуру Transaction(userId: String, amount: Double, currency: String, timestamp: String)
     Отфильтровать транзакции с отрицательной или нулевой суммой
     Сгруппировать валидные транзакции по валюте
@@ -95,50 +96,99 @@ import cats.effect.kernel.Par
     Какие edge cases ты учел/не учел
     Теорию вокруг использованных конструкций
 
-*/
+    первое решение 
+    1. В конце Error вместо String
+    2. Нет проверки пустых строк, но это может падать при парсе разделителя ;
+    3. нет валидации даты и сurrency (currency - словарь тикеров )
+    4. cбор ошибок fast-failed
+        1. можно использовать все собранные ошибки
+        2. можно в transaction - каждое поле either на случай, 
+        что какие-то определенные поля дальше в расчетах нужны будут
+    5. больше тестов
+    6. пояснее функции - cats может помочь
+    7. вместо tuple - case class
+
+   */
 
 
   val rawData: List[String] = List(
-  "user1;100.50;USD;2024-01-01",
-  "user2;invalid;EUR;2024-01-02",  // невалидная сумма
-  "user3;-50.00;USD;2024-01-03",   // отрицательная сумма
-  "user1;200.00;USD;2024-01-04",
-  "malformed_string",              // невалидный формат
-  "user2;75.25;EUR;2024-01-05",
-  "user3;300.00;EUR;2024-01-06"
-)
+    "user1;100.50;USD;2024-01-01",
+    "user2;invalid;EUR;2024-01-02", // невалидная сумма
+    "user3;-50.00;USD;2024-01-03", // отрицательная сумма
+    "user1;200.00;USD;2024-01-04",
+    "malformed_string", // невалидный формат
+    "user2;75.25;EUR;2024-01-05",
+    "user3;300.00;EUR;2024-01-06"
+  )
 
   sealed trait ParseError
   case object InvalidFormat extends ParseError
+  case object DoubleParseError extends ParseError
 
-  case class Transaction(userId: String, amount: Double, currency: String, timestamp: String)
-  
+  case class Transaction(
+      userId: String,
+      amount: Double,
+      currency: String,
+      timestamp: String
+  )
+
   object Transaction {
-    def fromString(s: String): Either[ParseError, Transaction] = {
+    def validateFormat(
+        s: String
+    ): Either[ParseError, (String, String, String, String)] = {
       s.split(';') match
-        case Array(userId, amount, currency, timestamp) => 
-          validateAmount(amount).flatMap( validatedAmount => 
-            Right(Transaction(userId, validatedAmount, currency, timestamp))
-          )
-
-        case _ =>  Left(InvalidFormat)
+        case Array(userId, amount, currency, timestamp) =>
+          Right((userId, amount, currency, timestamp))
+        case _ => Left(InvalidFormat)
     }
 
-    private def validateAmount(amount: String): Either[ParseError, Double] = ???
+    def fromRawStrings(
+        t: (String, String, String, String)
+    ): (String, Either[ParseError, Transaction]) = {
+      (
+        t._3,
+        validateAmount(t._2).flatMap(amount =>
+          Right(Transaction(t._1, amount, t._3, t._4))
+        )
+      )
+    }
+
+    private def validateAmount(amount: String): Either[ParseError, Double] =
+      Try
+        .apply {
+          amount.toDouble
+        }
+        .toEither
+        .fold(_ => Left(DoubleParseError), d => Right(d))
   }
 
-  def totalAmountInTxByCurrency(tx: List[String]): Map[String, Either[String, Double]] = {
+  def totalAmountInTxByCurrency(
+      tx: List[String]
+  ): Map[String, Either[ParseError, Double]] = {
     tx
-      .map(Transaction.fromString)
-      .groupMapReduce()
-
-
-    Map.empty
+      .map(Transaction.validateFormat)
+      .map(_.toOption)
+      .flatten
+      .map(Transaction.fromRawStrings)
+      .filter {
+        case (_, Right(value)) if value.amount > 0 => true
+        case _                                     => false
+      }
+      .groupMapReduce { _._1 } { (currency, txEither) =>
+        txEither.map(_.amount)
+      } { (a, b) =>
+        for {
+          amount1 <- a
+          amount2 <- b
+        } yield amount1 + amount2
+      }
   }
 
   // tests
   assert(totalAmountInTxByCurrency(List.empty) == Map.empty)
   assert(totalAmountInTxByCurrency(List("malformed_string")) == Map.empty)
-  // assert(totalAmountInTxByCurrency(List("user2;invalid;EUR;2024-01-02")) == Map("EUR" -> Left("error_parsing")))
-
-
+  assert(
+    totalAmountInTxByCurrency(List("user2;invalid;EUR;2024-01-02")) == Map(
+      "EUR" -> Left(DoubleParseError)
+    )
+  )
