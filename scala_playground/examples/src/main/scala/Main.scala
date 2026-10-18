@@ -113,7 +113,7 @@ object IOExample extends IOApp.Simple {
     6. пояснее функции - cats может помочь
     7. вместо tuple - case class
 
-   */
+    
 
   val rawData: List[String] = List(
     "user1;100.50;USD;2024-01-01",
