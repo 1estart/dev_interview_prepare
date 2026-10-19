@@ -45,3 +45,11 @@ object LeetcodeTraining:
     }
     findPerfectSquares(n)
   }
+
+  def targetIndices(nums: Array[Int], target: Int): List[Int] = {
+    val sorted = nums.sorted
+    val firstIndex = sorted.indexOf(target)
+    if (firstIndex != -1) then {
+      (firstIndex to sorted.lastIndexOf(target)).toList
+    } else List.empty
+  }

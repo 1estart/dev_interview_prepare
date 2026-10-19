@@ -1,6 +1,6 @@
 //> using scala "3.7.4"
 //> using dep "org.typelevel::cats-core:2.13.0"
 //> using dep "org.typelevel::cats-effect:3.7.1"
-//> using dep "com.softwaremill.sttp.client4::core::4.0.27"
+//> using dep "com.softwaremill.sttp.client4::core::4.1.0"
 //> using dep "org.scalameta::munit:1.3.6"
 //> using dep "org.scalatest::scalatest::3.2.20"

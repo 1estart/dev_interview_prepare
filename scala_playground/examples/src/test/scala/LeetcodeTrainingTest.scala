@@ -5,21 +5,26 @@ class LeetcodeTrainingTest extends AnyFunSuite {
     val res = LeetcodeTraining.add(1, 2)
     assertResult(expected = 3)(actual = res)
   }
+
   // test maximum product of three numbers
   // посмотреть хорошо краевые случаи
-  test("only three numbers in list") {
+  test("maximum product of three numbers: only three numbers in list") {
     assertResult(expected = 3)(actual =
       LeetcodeTraining.maximumProduct(List(1, 1, 3))
     )
   }
 
-  test("only three numbers in list with negative") {
+  test(
+    "maximum product of three numbers: only three numbers in list with negative"
+  ) {
     assertResult(expected = -300)(actual =
       LeetcodeTraining.maximumProduct(List(1, -100, 3))
     )
   }
 
-  test("simple more than three elements test") {
+  test(
+    "maximum product of three numbers: simple more than three elements test"
+  ) {
     assertResult(
       expected = 4
     )(
@@ -27,7 +32,9 @@ class LeetcodeTrainingTest extends AnyFunSuite {
     )
   }
 
-  test("max numbers include negative numbers") {
+  test(
+    "maximum product of three numbersL: max numbers include negative numbers"
+  ) {
     assertResult(
       expected = 10
     )(
@@ -35,7 +42,7 @@ class LeetcodeTrainingTest extends AnyFunSuite {
     )
   }
 
-  test("two of three max is negative") {
+  test("maximum product of three numbers: two of three max is negative") {
     assertResult(
       expected = 39200
     )(
@@ -44,7 +51,7 @@ class LeetcodeTrainingTest extends AnyFunSuite {
   }
 
   // element more than quater times
-  test("small array with one elem") {
+  test("element more than quater times: small array with one elem") {
     assertResult(
       expected = 1
     )(
@@ -52,7 +59,7 @@ class LeetcodeTrainingTest extends AnyFunSuite {
     )
   }
 
-  test("small array with two") {
+  test("element more than quater times: small array with two") {
     assertResult(
       expected = 1
     )(
@@ -60,7 +67,7 @@ class LeetcodeTrainingTest extends AnyFunSuite {
     )
   }
 
-  test("small array with three") {
+  test("element more than quater times: zssmall array with three") {
     assertResult(
       expected = 1
     )(
@@ -68,7 +75,7 @@ class LeetcodeTrainingTest extends AnyFunSuite {
     )
   }
 
-  test("array with five five") {
+  test("element more than quater times: array with five five") {
     assertResult(
       expected = 5
     )(
@@ -76,7 +83,7 @@ class LeetcodeTrainingTest extends AnyFunSuite {
     )
   }
 
-  test("seven elements") {
+  test("element more than quater times: seven elements") {
     assertResult(
       expected = 5
     )(
@@ -86,7 +93,7 @@ class LeetcodeTrainingTest extends AnyFunSuite {
   }
 
   // number of perfect squares
-  test("simple minimal tests") {
+  test("number of perfect squares: simple minimal tests") {
     assertResult(
       3
     )(
@@ -94,11 +101,28 @@ class LeetcodeTrainingTest extends AnyFunSuite {
     )
   }
 
-  test("simple minimal tests with 13") {
+  test("number of perfect squares: simple minimal tests with 13") {
     assertResult(
       2
     )(
       actual = LeetcodeTraining.numSquares(13)
+    )
+  }
+
+  // target indices
+  test("target indices: empty result case") {
+    assertResult(
+      expected = List.empty
+    )(
+      actual = LeetcodeTraining.targetIndices(Array(1, 2, 3, 4), 5)
+    )
+  }
+
+  test("target indices: non-empty list result case") {
+    assertResult(
+      expected = List(1, 2)
+    )(
+      actual = LeetcodeTraining.targetIndices(Array(1, 2, 3, 2), 2)
     )
   }
 
