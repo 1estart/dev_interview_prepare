@@ -126,4 +126,20 @@ class LeetcodeTrainingTest extends AnyFunSuite {
     )
   }
 
+  test("sortable integers: three elements array") {
+    assertResult(
+      expected = 3
+    )(
+      actual = LeetcodeTraining.sortableIntegersNonFunc(Array(3, 1, 2))
+    )
+  }
+
+  test("sortable integers: three elements array with 0 sum") {
+    assertResult(
+      expected = 0
+    )(
+      actual = LeetcodeTraining.sortableIntegersNonFunc(Array(7, 6, 5))
+    )
+  }
+
 }
