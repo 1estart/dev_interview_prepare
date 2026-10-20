@@ -4,3 +4,4 @@
 //> using dep "com.softwaremill.sttp.client4::core::4.1.0"
 //> using dep "org.scalameta::munit:1.3.6"
 //> using dep "org.scalatest::scalatest::3.2.20"
+//> using dep "dev.zio::zio::2.1.27"
