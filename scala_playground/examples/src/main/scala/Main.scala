@@ -11,6 +11,7 @@ import scala.annotation.tailrec
 import cats.effect.IOApp
 import cats.effect.IO
 import cats.implicits._
+import scala.util.Random
 
 object IOExample extends IOApp.Simple {
   /*
@@ -337,4 +338,14 @@ object IOExample extends IOApp.Simple {
   // println("All assertions passed")
   // println("***********************************************************")
 
+  println("Hi")
+  println(
+    TrampolineAdventuries
+      .hasEvenFold(LazyList.continually(Random.nextInt(1024)))
+      .value
+  )
+
+  val odd = TrampolineAdventuries.isOdd(100501).value
+  val even = TrampolineAdventuries.isEven(100501).value
+  println(s"odd: ${odd}, even: ${even}")
 }
