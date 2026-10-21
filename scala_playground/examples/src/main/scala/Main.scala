@@ -348,4 +348,11 @@ object IOExample extends IOApp.Simple {
   val odd = TrampolineAdventuries.isOdd(100501).value
   val even = TrampolineAdventuries.isEven(100501).value
   println(s"odd: ${odd}, even: ${even}")
+
+  import ZIOFunctionalTypes.ZIOConcurrencyPrimitives.NonEmptyList
+  val l = NonEmptyList(
+    1,
+    Some(NonEmptyList(2, Some(NonEmptyList(3, Some(NonEmptyList(4, None))))))
+  )
+  println(l.reverse)
 }
