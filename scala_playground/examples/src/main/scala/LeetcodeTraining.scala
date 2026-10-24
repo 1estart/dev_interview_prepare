@@ -138,3 +138,47 @@ object LeetcodeTraining:
     }
     result
   }
+
+  def countDaysTogether(
+      arriveAlice: String,
+      leaveAlice: String,
+      arriveBob: String,
+      leaveBob: String
+  ): Int = {
+    case class MDDate(m: Int, d: Int) {
+      def in(range: MDRange): Boolean = {
+        val moreThanFrom = {
+          if (range.from.m > this.m) then false
+          else if (range.from.m < this.m) then true
+          else { range.from.d <= this.d }
+        }
+        val lessThanTo = {
+          if (this.m > range.to.m) then false
+          else if (this.m < range.to.m) then true
+          else { this.d <= range.to.d }
+        }
+        moreThanFrom && lessThanTo
+      }
+    }
+    object MDDate {
+      def fromString(s: String): MDDate = {
+        val Array(m, d) = s.split("-")
+        MDDate(m.toInt, d.toInt)
+      }
+    }
+    case class MDRange(from: MDDate, to: MDDate)
+
+    val rangeAlice =
+      MDRange(MDDate.fromString(arriveAlice), MDDate.fromString(leaveAlice))
+    val rangeBob =
+      MDRange(MDDate.fromString(arriveBob), MDDate.fromString(leaveBob))
+
+    List(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31).zipWithIndex
+      .map((e, i) => (e, i + 1))
+      .flatMap { (numberOfDays, month) =>
+        (1 to numberOfDays).map(MDDate(month, _))
+      }
+      .count { d =>
+        d.in(rangeAlice) && d.in(rangeBob)
+      }
+  }

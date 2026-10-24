@@ -355,4 +355,13 @@ object IOExample extends IOApp.Simple {
     Some(NonEmptyList(2, Some(NonEmptyList(3, Some(NonEmptyList(4, None))))))
   )
   println(l.reverse)
+
+  println(
+    LeetcodeTraining.countDaysTogether(
+      "09-01",
+      "10-19",
+      "06-19",
+      "10-20"
+    )
+  )
 }
