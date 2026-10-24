@@ -1,0 +1,14 @@
+# Cabal build artifacts
+dist/
+dist-newstyle/
+.cabal-sandbox/
+cabal.sandbox.config
+
+# GHC/HLS cache
+.hie-bios/
+.stack-work/
+
+# Editor/OS
+.DS_Store
+*.swp
+EOF
