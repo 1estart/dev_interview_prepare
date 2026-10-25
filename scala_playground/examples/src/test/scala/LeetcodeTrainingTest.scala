@@ -142,4 +142,19 @@ class LeetcodeTrainingTest extends AnyFunSuite {
     )
   }
 
+  test("closed islands: simple test") {
+    assertResult(
+      expected = 2
+    )(
+      actual = LeetcodeTraining.closedIsland(
+        Array(
+          Array(1, 1, 1, 1, 1, 1, 1, 0),
+          Array(1, 0, 0, 0, 0, 1, 1, 0),
+          Array(1, 0, 1, 0, 1, 1, 1, 0),
+          Array(1, 0, 0, 0, 0, 1, 0, 1),
+          Array(1, 1, 1, 1, 1, 1, 1, 0)
+        )
+      )
+    )
+  }
 }
