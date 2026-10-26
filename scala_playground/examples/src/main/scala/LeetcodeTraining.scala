@@ -228,3 +228,52 @@ object LeetcodeTraining:
       }
       .size
   }
+
+  def countIslands(grid: Array[Array[Int]], k: Int): Int = {
+    import scala.collection.mutable.Map
+    case class Island(number: Int)
+    case class Point(row: Int, column: Int)
+    var number: Int = 0
+    val rows = grid.size
+    val cols = grid(0).size
+    var m: Map[Point, Island] = Map.empty
+    def findAnotherPartsOfIsland(p: Point, numberOfIsland: Int): Unit = {
+      if (!m.contains(p)) {
+        val isIsland = grid(p.row)(p.column) > 0
+
+        m += p -> Island(numberOfIsland)
+        val left = p.copy(column = p.column - 1)
+        val top = p.copy(row = p.row - 1)
+        val right = p.copy(column = p.column + 1)
+        val bottom = p.copy(row = p.row + 1)
+        List(left, top, right, bottom)
+          .withFilter(p =>
+            p.row >= 0 && p.row < rows && p.column >= 0 && p.column < cols
+          )
+          .withFilter(p => grid(p.row)(p.column) > 0)
+          .foreach(findAnotherPartsOfIsland(_, numberOfIsland = numberOfIsland))
+      }
+    }
+
+    (0 until rows)
+      .flatMap(row => (0 until cols).map((row, _)))
+      .foreach { (row, column) =>
+        val p = Point(row, column)
+        if (grid(p.row)(p.column) > 0 && !m.contains(p)) {
+          findAnotherPartsOfIsland(p, numberOfIsland = number)
+          number += 1
+        }
+      }
+    m.toList
+      .map { case (p, island) =>
+        island.number -> grid(p.row)(p.column)
+      }
+      .groupBy { case (islandNumber, _) =>
+        islandNumber
+      }
+      .values
+      .map { cells =>
+        cells.map(_._2.toLong).sum
+      }
+      .count(_ % k == 0)
+  }
