@@ -277,3 +277,12 @@ object LeetcodeTraining:
       }
       .count(_ % k == 0)
   }
+
+  def createGrid(m: Int, n: Int): Array[String] = {
+    (0 until m).map { row =>
+      if (row == 0) then Array.fill(n)(".").mkString
+      else {
+        Array.fill(n - 1)("#").mkString + "."
+      }
+    }.toArray
+  }
