@@ -3,6 +3,7 @@ import scala.annotation.tailrec
 import scala.compiletime.ops.any
 import cats.syntax.all
 import scala.collection.MapOps
+import cats.instances.future
 object LeetcodeTraining:
   def add(a: Int, b: Int): Int = a + b
 
@@ -285,4 +286,87 @@ object LeetcodeTraining:
         Array.fill(n - 1)("#").mkString + "."
       }
     }.toArray
+  }
+
+  def minCostRaw(grid: Array[Array[Int]]): Int = {
+    def possibleXorForCell(
+        value: Int,
+        prevs: Array[Boolean],
+        resArr: Array[Boolean]
+    ): Array[Boolean] = {
+      prevs.zipWithIndex.foreach { case (present: Boolean, xor) =>
+        if (present) { resArr(xor ^ value) = true }
+      }
+      resArr
+    }
+    val m = grid.size
+    val n = grid(0).size
+    var dp: Array[Array[Array[Boolean]]] = Array.empty
+
+    (0 until m).foreach { i =>
+      (0 until n).foreach { j =>
+        if (i == 0 && j == 0) {
+          var xors = Array.fill(1024)(false)
+          xors(grid(0)(0)) = true
+          dp(0)(0) = xors
+        } else {
+          var array: Array[Boolean] = Array.fill(1024)(false)
+          dp(i)(j) = array
+          val (upperI, upperJ) = (i - 1, j)
+          if (upperI >= 0) {
+            array = possibleXorForCell(grid(i)(j), dp(upperI)(upperJ), dp(i)(j))
+            dp(i)(j) = array
+          }
+          val (leftI, leftJ) = (i, j - 1)
+          if (leftI >= 0) {
+            array = possibleXorForCell(grid(i)(j), dp(leftI)(leftJ), dp(i)(j))
+            dp(i)(j) = array
+          }
+        }
+      }
+    }
+
+    dp(m - 1)(n - 1).zipWithIndex.find((is, _) => is).get._2
+  }
+
+  def minPathXor(grid: Array[Array[Int]]): Int = {
+    val m = grid.length
+    val n = grid(0).length
+    val maxVal = 1024
+
+    val dp: Array[Array[Array[Boolean]]] =
+      Array.tabulate(m, n)((_, _) => new Array[Boolean](maxVal))
+
+    // База - первый xor - число (i, j) = (0, 0)
+    dp(0)(0)(grid(0)(0)) = true
+
+    for (i <- 0 until m; j <- 0 until n) {
+      if (i == 0 && j == 0) {}
+      else {
+        val cur = dp(i)(j)
+        val v = grid(i)(j)
+
+        // Аккумулируем XOR от верхнего соседа
+        if (i > 0) {
+          val prev = dp(i - 1)(j)
+          var x = 0
+          while (x < maxVal) {
+            if (prev(x)) cur(x ^ v) = true
+            x += 1
+          }
+        }
+
+        // Аккумулируем XOR от левого соседа
+        if (j > 0) {
+          val prev = dp(i)(j - 1)
+          var x = 0
+          while (x < maxVal) {
+            if (prev(x)) cur(x ^ v) = true
+            x += 1
+          }
+        }
+      }
+    }
+
+    dp(m - 1)(n - 1).indexWhere(identity)
   }
